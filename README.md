@@ -7,7 +7,8 @@ I like being able to not have to choose, i.e. prematurely optimize and limit, ri
 Currently supported point representations are 2d: cons, complex, point:2dpoint, vector 3d: point:3dpoint, vector and in a separate point-3d-vectors package support for Shinmera's Vec2, Vec3, and Vec4 struct formats. Perhaps a goal down the road is to replace all the vector stuff with some optimized library like mfiano's Origin(pretty sure that's vector based). 
 
 All lesser dimension points are assumed to lie at 0 on higher planes. 
-Any combination of different point formats will return a point in the same format as the left most point. <-rethink this, while easily specified and implemented, if a 2d point is assumed to lie at 0 in 3d, subtracting or adding a 3d point should shift the 2d point into 3d.
+Any combination of different point formats will return a point in the same format as the left most point. <-rethink this, while easily specified and implemented, if a 2d point is assumed to lie at 0 in 3d, subtracting or adding a 3d point should shift the 2d point into 3d. Then again, if zero is the point of ignorance/indepence of higher dimensions can anything really change that?
+
 examples.
 
 ```
