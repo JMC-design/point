@@ -18,6 +18,9 @@
   (:method ((p vector)) (if (= 3 (length p))(aref p 2) 0))
   (:method (p) 0)) ;more harmful than helpful? same above
 
+(defgeneric w (p)
+  (:method (p) 0))
+
 (defgeneric (setf x) (p value)
   (:method (value (p 3dpoint)) (setf (sx p) value))
   (:method (value (p vector)) (setf (aref p 0) value))
@@ -37,6 +40,8 @@
   (:method (value (p vector)) (setf (aref p 2) value))
   (:method (value p)));mucho badness, no?
 
+(defgeneric (setf w) (p value)
+  (:method (value p)))
 ;; Transforms
 (defgeneric ->list (p)
   (:method ((p 2dpoint)) (list (sx p) (sy p)))
@@ -72,12 +77,13 @@
   (:method ((p number))1))
 
 (defgeneric copy (p)
-  (:method ((p 3dpoint)) (3d (x p) (y p) (z p)))
+  (:method ((p 3dpoint)) (3d (sx p) (sy p) (sz p)))
   (:method ((p vector)) (copy-seq p))
-  (:method ((p 2dpoint)) (2d (x p) (y p)))
+  (:method ((p 2dpoint)) (2d (sx p) (sy p)))
   (:method ((p cons)) (cons (car p) (cdr p)))
   (:method ((p complex))(complex (x p) (y p)))
-  (:method ((list list)) (mapcar #'copy list)))
+  ;(:method ((list list)) (mapcar #'copy list))
+  ) 
 
 (defgeneric element-type (p)
   (:method (p) 'number))

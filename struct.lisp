@@ -1,4 +1,4 @@
-(in-package :point)
+(in-package #:point)
 
 ;;;; struct points to fall back on
 (declaim (inline 2d 3d sx sy sz))

@@ -22,6 +22,7 @@
            #:copy
            #:element-type ;isn't anything that uses this going to be impl specific. maybe just provide a generic to create based on type.
 
+           #:w
            #:x
 	   #:y
 	   #:z

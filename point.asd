@@ -4,10 +4,11 @@
   :version "0.0.1"
   :licence "LGPL"
   :author "Johannes Martinez Calzada"
+  :serial t
   :components ((:file "package")
                (:file "macros")
                (:file "struct")
                (:file "protocol-required")
-               (:file "protocol-optional")
-               (:file "utility")
+               (:file "protocol-optional" :depends-on ("macros"))
+               (:file "utility"  :depends-on ("macros"))
                (:file "documentation")))
