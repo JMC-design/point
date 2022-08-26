@@ -6,7 +6,8 @@
            cl:/
            cl:random
            cl:min
-           cl:max)
+           cl:max
+           cl:type)
   (:export #:2dpoint
 	   #:3dpoint
 	   #:2d
@@ -17,15 +18,18 @@
 
            ;; Protocol basic parts that need to be implemented by new implementations
            ;; and setf for x y z.
-
-           #:dimensions
+           
+           #:new
            #:copy
+           #:dimensions
            #:element-type ;isn't anything that uses this going to be impl specific. maybe just provide a generic to create based on type.
-
+           #:type 
+           
            #:w
            #:x
 	   #:y
 	   #:z
+           #:set-all
            
            #:->list
 	   #:->vector
@@ -58,6 +62,10 @@
            #:euclidean
            #:manhattan
            #:minkowski      ;just rename to distance?
+           #:1norm
+           #:2norm
+           #:pnorm
+
            #:of-division
 
            #:angle
@@ -77,6 +85,7 @@
            #:in-polygon?
            #:bounds
            #:sphericize
+           #:average
 
            ;; junk to be cut or refined
 
@@ -95,4 +104,4 @@
            #:+x-axis+
            #:+y-axis+
            #:+z-axis+
-           ))
+           #:new))

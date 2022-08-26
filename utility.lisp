@@ -23,17 +23,38 @@
   (:method (p1 p2 &optional (h 2)) (minkowski p1 p2 h)))
 (defgeneric of-division (p1 p2 &optional divisor)
    (:method (p1 p2 &optional (divisor 0.5))(* (+ p1 p2) divisor)))
+(defgeneric 1norm (p)
+  (:method (p) (manhattan p +origin+) ))
+(defgeneric 2norm (p)
+  (:method (p) (euclidean p +origin+)))
+(defgeneric pnorm (p hyper)
+  (:method (p hyper) (minkowski p +origin+ hyper)))
 
 
-(defun random (n &optional (width 500) (height width) depth &key (random-fn #'cl:random)) ;add return types
-  (random-points n width height depth :random-fn random-fn))
-(Defun random-points (n width height &optional depth &key (random-fn #'cl:random) &aux (dimension (if depth 3 2)))
-  (let ((points (case dimension
-		  (2 (loop :for i :below n :collect (point:2d (funcall random-fn width) (funcall random-fn height))))
-		  (3 (loop :for i :below n :collect (point:3d (funcall random-fn width) (funcall random-fn height) (funcall random-fn depth)))))))
-    (if (= (length points) 1) ;why force everybody to check if its a list or atom?
-	(car points)
-	points)))
+
+(defun random (type &optional (n 1) (width 500) (height width) depth &key (random-fn #'cl:random)) ;add return types
+  (let ((points (random-points type n width height depth :random-fn random-fn)))
+    (if (= 1 n)
+        (car points)
+        points)))
+
+(Defun random-points (type n width height &optional depth &key (random-fn #'cl:random) &aux (dimension (if depth 3 2)))
+  (loop :repeat n :collect (case type
+                             (:vector (if (= 3 dimension)
+                                          (vector (funcall random-fn width)(funcall random-fn height)(funcall random-fn depth))
+                                          (vector (funcall random-fn width)(funcall random-fn height))))
+                             (:cons (cons (funcall random-fn width)(funcall random-fn height)))
+                             (:complex (complex (funcall random-fn width)(funcall random-fn height)))
+                             (:2d (2d (funcall random-fn width)(funcall random-fn height)))
+                             (:3d (3d (funcall random-fn width)(funcall random-fn height)(funcall random-fn depth)))
+                             (t (new type (funcall random-fn width)(funcall random-fn height)(funcall random-fn depth)))))
+  ;; (let ((points (case dimension
+  ;;       	  (2 (loop :for i :below n :collect (point:2d (funcall random-fn width) (funcall random-fn height))))
+  ;;       	  (3 (loop :for i :below n :collect (point:3d (funcall random-fn width) (funcall random-fn height) (funcall random-fn depth)))))))
+  ;;   (if (= (length points) 1) ;why force everybody to check if its a list or atom?
+  ;;       (car points)
+  ;;       points))
+  )
 
 (defun transform (p transform)
   (let ((result (copy p)))
@@ -68,13 +89,13 @@
 					           (< (x p1)(x p2)))))))
 
 
-;;;; taken from kons-9, frankly it's just blatant copying at the bottom. I didn't include some that I didn't understand the purpose of, or didn't see as part of a protocal but a usage of that protocol. I may have bent that rule.
+;;;; taken from kons-9, frankly it(quit's just blatant copying at the bottom. I didn't include some that I didn't understand the purpose of, or didn't see as part of a protocal but a usage of that protocol. I may have bent that rule.
 
 ;I may unbend this. What do specific points have to do with a point protocol?
-(defconstant +origin+ (point:3d 0 0 0))
-(defconstant +x-axis+ (3d 1 0 0))
-(defconstant +y-axis+ (3d 0 1 0))
-(defconstant +z-axis+ (3d 0 0 1))
+;; (defconstant +origin+ (point:3d 0 0 0))
+;; (defconstant +x-axis+ (3d 1 0 0))
+;; (defconstant +y-axis+ (3d 0 1 0))
+;; (defconstant +z-axis+ (3d 0 0 1))
 
 (declaim (inline slerp))
 (defun slerp (i j tee &optional transform) "simple"
@@ -116,7 +137,7 @@
 
 (defgeneric angle-sine (p1 &optional p2)
   (:method (p1 &optional p2) (let ((c (angle-cosine p1 p2)))
-                               (sqrt (1- (cl:* c c))))))
+                               (sqrt (cl:- 1 (cl:* c c))))))
 
 (defgeneric angle-acos (p1 &optional p2)
   (:method (p1 &optional (p2 p1)) (acos (max -1.0 (min 1.0 (dot (normalize p1) (normalize p2)))))))
@@ -142,10 +163,10 @@
 	                                    do (setf dtheta (+ dtheta (* 2 pi))))
                                       dtheta))))
 
-(defun jitter (p amount &optional excluded-channels)
+(defun jitter (p amount &optional random-fn excluded-channels)
   (if (= 2 (dimensions p))
-      (+ p (random 1 amount amount))
-      (+ p (random 1 amount amount amount))))
+      (+ p (random (type p) 1 amount amount nil :random-fn random-fn))
+      (+ p (random (type p) 1 amount amount amount :random-fn random-fn))))
 
 ;;;; functions for groups of points. Does this even belong here?
 
@@ -172,4 +193,7 @@
 (defun sphericize (p radius &optional (factor 1.0) (center +origin+))
   (lerp p (* (normalize (- p center)) radius) factor))
 
+
+;; (progn (setf *p3d* (point:random 1000000 1000.0 1000.0 1000.0)) (values))
+;; (progn (setf *psv* (loop :repeat 1000000 :collect (3d-vectors:vec3-random 0 1000.0 ))) (values))
 

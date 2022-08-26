@@ -42,6 +42,17 @@
 
 (defgeneric (setf w) (p value)
   (:method (value p)))
+
+(defgeneric set-all (p x y &optional z w)
+  (:method ((p 3dpoint) x y &optional z w) (setf (sx p) x (sy p) y (sz p) z)p)
+  (:method ((p 2dpoint) x y &optional z w) (setf (sx p) x (sy p) y)p)
+  (:method ((p vector) x y &optional z w)  (let ((dim (dimensions p)))
+                                             (setf (aref p 0) x (y p) y)
+                                             (cond ((and (= dim 3) z) (setf (z p) z))
+                                                   ((and (= dim 4) w) (setf (w p) z)))
+                                             p))
+  (:method ((p cons) x y &optional z w)  (rplaca p x ) (rplacd p y)p)
+  (:method ((p complex) x y &optional z w) (complex x y)p)) ;this can't be right)
 ;; Transforms
 (defgeneric ->list (p)
   (:method ((p 2dpoint)) (list (sx p) (sy p)))
@@ -78,13 +89,26 @@
 
 (defgeneric copy (p)
   (:method ((p 3dpoint)) (3d (sx p) (sy p) (sz p)))
-  (:method ((p vector)) (copy-seq p))
   (:method ((p 2dpoint)) (2d (sx p) (sy p)))
+  (:method ((p vector)) (copy-seq p))
   (:method ((p cons)) (cons (car p) (cdr p)))
   (:method ((p complex))(complex (x p) (y p)))
   ;(:method ((list list)) (mapcar #'copy list))
-  ) 
+  )
+
+(defgeneric new (type x y &optional z w)
+  (:method ((type (eql :cons)) x y &optional z w) (declare (ignore z w)) (cons x y))
+  (:method ((type (eql :2d)) x y &optional z w) (declare (ignore z w)) (2d x y))
+  (:method ((type (eql :3d)) x y &optional z w) (declare (ignore w)) (3d x y z))
+  (:method ((type (eql :complex)) x y &optional z w) (declare (ignore z w)) (complex x y))
+  (:method ((type (eql :vector)) x y &optional z w)  (cond (w (vector x y z w)) (z (vector x y z)) (t (vector x y)))))
 
 (defgeneric element-type (p)
   (:method (p) 'number))
 
+(defgeneric type (p)
+  (:method ((p 3dpoint)) :3d)
+  (:method ((p 2dpoint)) :2d)
+  (:method ((p vector)) :vector)
+  (:method ((p cons)) :cons)
+  (:method ((p complex)) :complex))
