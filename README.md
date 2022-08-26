@@ -4,10 +4,11 @@ rationale:
 I've seen too many people start a graphics project and immediately write some throw away point interface, usually replaced in needs of speed with something less flexible. I like flexibility. I like my points not always having to be floats.  Maybe I want rationals?
 I like being able to not have to choose, i.e. prematurely optimize and limit, right away how my points will be represented. It is also useful for AoC which was my main use until recently.  It's sort of necessary now to allow my graphics libraries to accept most point formats you can throw a stick at.
 
-Currently supported point representations are 2d: cons, complex, point:2dpoint, vector 3d: point:3dpoint, vector and in a separate point-3d-vectors package support for Shinmera's Vec2, Vec3, and Vec4 formats. 
+Currently supported point representations are 2d: cons, complex, point:2dpoint, vector 3d: point:3dpoint, vector and in a separate point-3d-vectors package support for Shinmera's Vec2, Vec3, and Vec4 struct formats. Perhaps a goal down the road is to replace all the vector stuff with some optimized library like mfiano's Origin(pretty sure that's vector based). 
 
 All lesser dimension points are assumed to lie at 0 on higher planes. 
-Any combination of different point formats will return a point in the same format as the left most point.
+Any combination of different point formats will return a point in the same format as the left most point. <-rethink this, while easily specified and implemented, if a 2d point is assumed to lie at 0 in 3d, subtracting or adding a 3d point should shift the 2d point into 3d. Then again, if zero is the point of ignorance/indepence of higher dimensions can anything really change that?
+
 examples.
 
 ```
@@ -36,3 +37,8 @@ LIFE> (point:minkowski *** (cons 4 3) 2)
 5.0
 LIFE> (point:== (cons 10 10) (3d-vectors:vec2 10 10))
 T
+LIFE> (point:of-division (cons 0 0) (cons 10 10) .5)
+(5.0 . 5.0)
+LIFE> (point:of-division (cons 0 0) (cons 10 10) .8)
+(8.0 . 8.0)
+
