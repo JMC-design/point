@@ -10,6 +10,11 @@
   (:method ((p1 vector)  (p2 vector))            (map 'vector #'cl:+ p1 p2))
   (:method ((p1 cons)    (p2 cons))              (cons (cl:+ (car p1) (car p2)) (cl:+ (cdr p1) (cdr p2))))
   (:method ((p1 complex) (p2 complex))           (complex (cl:+ (realpart p1) (realpart p2)) (cl:+ (imagpart p1)(imagpart p2))))
+  (:method (p1 (scalar number)) (let ((p (copy p1)))
+                                  (incf (x p) scalar)
+                                  (incf (y p) scalar)
+                                  (incf (z p) scalar)
+                                  p))
   (:method (p1 p2)(with-dot
                     (let ((p (copy p1)))
                       (setf p.x (+ p1.x p2.x)
@@ -25,6 +30,11 @@
   (:method ((p1 vector)  (p2 vector))      (map 'vector #'cl:- p1 p2))
   (:method ((p1 cons)    (p2 cons))        (cons (cl:- (car p1) (car p2)) (cl:- (cdr p1) (cdr p2))))
   (:method ((p1 complex) (p2 complex))     (complex (cl:- (realpart p1) (realpart p2)) (cl:- (imagpart p1)(imagpart p2))))
+  (:method (p1 (scalar number)) (let ((p (copy p1)))
+                                  (decf (x p) scalar)
+                                  (decf (y p) scalar)
+                                  (decf (z p) scalar)
+                                  p))
   (:method (p1 p2) (with-dot
                      (let ((p (copy p1)))
                        (setf p.x (- p1.x p2.x)
@@ -158,6 +168,5 @@
                               (- (* a.x b.y) (* a.y b.x))))))
 
 (defun average (&rest points)
-  (declare (optimize debug))
   (let ((div (cl:/ 1.0 (length points))))
     (* (reduce #'+ points) (new (type (car points))div div div div))))
